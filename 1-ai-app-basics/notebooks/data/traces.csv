@@ -1,0 +1,51 @@
+team_name,ground_truth,model_output
+Adelaide Crows,australian,australian
+Brisbane Lions,australian,australian
+Carlton Blues,australian,australian
+Collingwood Magpies,australian,australian
+Essendon Bombers,australian,australian
+Fremantle Dockers,australian,australian
+Geelong Cats,australian,australian
+Gold Coast Suns,australian,australian
+Greater Western Sydney (GWS) Giants,australian,australian
+Hawthorn Hawks,australian,australian
+Melbourne Demons,australian,australian
+North Melbourne Kangaroos,australian,australian
+Port Adelaide Power,australian,australian
+Richmond Tigers,australian,australian
+St Kilda Saints,australian,australian
+Sydney Swans,australian,australian
+West Coast Eagles,australian,australian
+Western Bulldogs,australian,australian
+Cardinals,american,american
+Falcons,american,"(i cannot accurately determine the origin of ""falcons"" without context.)"
+Ravens,american,american
+Bills,american,american
+Panthers,american,american
+Bears,american,american
+Bengals,american,american
+Browns,american,american
+Cowboys,american,american
+Broncos,american,american
+Lions,american,american
+Packers,american,american
+Texans,american,american
+Colts,american,american
+Jaguars,american,american
+Chiefs,american,american
+Raiders,american,american
+Chargers,american,american
+Rams,american,american
+Dolphins,american,american
+Vikings,american,american
+Patriots,american,american
+Saints,american,american
+Giants,american,american
+Jets,american,american
+Eagles,american,american
+Steelers,american,american
+49ers,american,american
+Seahawks,american,american
+Buccaneers,american,american
+Titans,american,australian
+Commanders,american,american

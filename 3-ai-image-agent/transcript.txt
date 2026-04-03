@@ -1,0 +1,536 @@
+# ravin<>hugo workshop
+**Date**: Monday, June 30, 2025 at 9:59 AM  
+**Duration**: 01:29:48  
+**Participants**: Ravin Kumar and hugo bowne-anderson
+
+[01:26] **hugo bowne-anderson**: It's so ex so exciting to be here to be teaching a workshop on from images to to agents, building and evaluating multimodal AI systems and workflows. So welcome, everyone. What I'm going to do is we're gonna have all the chat in Discord. What's up, PK? Great to see you. So Ravin is actually gonna post the the Discord link in YouTube. So if you could all come to the Discord, and we wanna have that so that we have a record of of the conversation as well.
+
+[01:59] **hugo bowne-anderson**: So feel free to introduce yourself here briefly, but once Ravin puts the link in the chat have you have you done that, Ravin? You're muted, by the way. I I've got it. I'm gonna do it.
+
+[02:13] **Ravin Kumar**: It's done. You guys got it.
+
+[02:15] **hugo bowne-anderson**: Oh, thanks. Fantastic. So if everyone can jump in the Discord, that would be super fun. And we have a lot of other conversations about these types of things here. But just by way of a bit more in introduction and I'll actually share my screen to to chat about this. Let me share my screen. So, Ravin, can you see Chrome? Yes. I can. Okay. Fantastic. So, everyone, please do introduce yourself in the chat in in Discord. It'll be great to know who you are, what your interest in such things are.
+
+[02:58] **hugo bowne-anderson**: Do you work in AI, or you're data product, ML person wanting to build more with AI energetic systems? I'm just super excited to be here with my my dear old friend and colleague, Ravin, who works at DeepMind on, among many other things, the Gemma series to show you how to use open weight models such as the the Gemma Gemma family to start building multimodal AI systems and and think about evaluating them, figure out how to turn them into agentic systems, so things that perform actions in in the real world.
+
+[03:30] **hugo bowne-anderson**: And this actually this workshop is one of several that Ravin and I have taught together, and I'll link to others in in Discord. But it was actually inspired in part by a talk Ravin gave during a a course I teach, building LM powered applications for data scientists and software engineers. We're starting a new cohort next week if you're interested. And in the GitHub repo, we're we'd be excited to offer you 10% off 10% off. And you can see, you know, all the things we cover and all the guest talks we have.
+
+[03:57] **hugo bowne-anderson**: And on top of that, all the credits we give you as well. So definitely check that out if you're interested. Ravin, I was wondering, maybe before we jump in, you could say a few words about what you're working on and and and Gemma more generally.
+
+[04:13] **Ravin Kumar**: Yeah. So as Hika said, I work at Google DeepMind. I work on a series of models. I some work on Gemini and some work on Gemma. But, really, we're just trying to get my goal is to get the the best models out to folks that we can in in both ecosystems, and I'm lucky to be on these large teams, which are constantly working to get the the state of the art models, endpoint models, and other things out to folks. So that's part of what we'll be showing you today.
+
+[04:41] **Ravin Kumar**: I'll be giving you some of the knowledge I have from the models that we released so you can have your best experience with these both Gemini and Gemini models as well.
+
+[04:50] **hugo bowne-anderson**: Amazing. And so all that having been said, just to give a bit of an overview of what we're doing, phase zero, we'll get started with image workflows locally. We'll start by setting up a simple but complete low local application where we connect to a local Gemma three model using Olama, send basic prompts and receive responses, and then build a basic Gradyo UI to interact with the model. Now we've actually done this in past workshops. So what we'll do is we'll do a speed run through that just to get everyone up to date.
+
+[05:18] **hugo bowne-anderson**: But then if you want way more detail around those things, we'll direct you to previous previous workshops. Then we'll start working through various image capabilities of of Gemma. So after basic prompting, we'll show things such as object recognition, counting, OCR. Let's say you want a OCR receipts, for for example. And I'm I'm on a work trip going around the world at the moment. So OCR of receipts is actually a really important thing for me currently. And then what we'll we'll do is start connecting all these things together with Gradio.
+
+[05:52] **hugo bowne-anderson**: And instead of using hard hard coded tools, we'll start moving toward dynamic system to show how such a system can after classifying an object in an image or something along those lines, then the LLM output can do some sort of workflow, something agentic, augment your LLM in in these ways. I was there anything I left out there, Ravin?
+
+[06:15] **Ravin Kumar**: No. That sounds great.
+
+[06:17] **hugo bowne-anderson**: Fantastic. And for those who haven't done all the installations yet, I suggest you don't do this in real time. If you haven't done it yet, I suggest you watch along and chat in the chat and and get that out of it and afterwards do do the installations. All that having been said, we'll be using Olama. And what I'll do now is actually jump into a a notebook. And I'm not gonna run this notebook locally.
+
+[06:43] **hugo bowne-anderson**: I'm just gonna talk you through some of it, and then I'll show you how we build the application with with with Gradio locally, essentially. So to begin with, what we wanna do is dive into Gemma's wait. Is this the correct yep. This is the correct notebook. Impressive image and capability. So moving beyond what we've done before in these workshops, traditional chat interfaces, just to explore how to construct robust models, routing flows. So what we're going to do is feed Gemma images.
+
+[07:14] **hugo bowne-anderson**: We'll then integrate GradIO, which will help us build an intuitive and easy to ship front end. And we'll talk about what GradIO is, but it's from the wonderful people at at Hugging Face. And it allows all of us to just ship very basic MVPs to each other constantly. Then that helps us with UI and UX. Then, of course, we're interested in observability and having a look at what's up in our system.
+
+[07:39] **hugo bowne-anderson**: So basic logging to SQLite, what we'll do, and then looking at some of our data using a piece of software from Simon Wilson called called dataset, which is a really nice way to locally explore databases. Okay? So what we're going to do is to get started, maybe you can say a few words now, Ravin, about even why why Gemma three and why Olama?
+
+[08:05] **Ravin Kumar**: So one is and this for the models we've as the name implies, we have Gemma one and Gemma two that we released last year. Those were text only models. So they really, yeah, only interacted text in, text out. But with the Gemma three series now, this Sorry.
+
+[08:21] **hugo bowne-anderson**: I lost your audio, Ravin, but it might be me. You're back now.
+
+[08:26] **Ravin Kumar**: Okay. The Gemma three series includes multimodality. So now image input is possible, and you're able to interact with both text and images. So that's one reason we're using Gemma three. Now you can use open weights models with all sorts of different tools. There's there's hiding phase. There's VLM. There's an entire ecosystem around open models. But consistently, especially for these tutorials, OLAMA is just a really easy option for you folks. It supports a variety of open models, not just Gemma. And but also it has, you know, Python interfaces. It has terminal interfaces.
+
+[09:02] **Ravin Kumar**: It integrates with a bunch of tools. So I if you're gonna be using LMs locally, OLAMA is a pretty nice choice for doing inference.
+
+[09:11] **hugo bowne-anderson**: I couldn't agree more. And spinning up local Olama servers is super super straightforward and being actually, one of the first things I got a new laptop recently. One of the first and it's a chunky laptop. So one of the first things I did was, you know, Olama run, you know, dot dot dot dot dot and ended up, you know, getting, I don't know, ten ten of my favorite models from Olama in in in the first couple of hours of having my my new laptop. So maybe also
+
+[09:36] **Ravin Kumar**: Yeah. We got to actually your first first question, and I'll just answer it now real quick. Ultrant's asked, can I use Gemini 2.5 Flash as my LM is of OLAMA? So just a little nuance here. OLAMA is not an LM. OLAMA is is an inference application, and it's able to pull in models open weights models like like Gemma, but there's others out there like Quen and Lama. A little confusingly named, but there's a bunch of open weight models out there. And OLAMA just runs those.
+
+[10:02] **Ravin Kumar**: But if you wanna use Gemini 2.5 Flash later in the later in the tutorial, we'll show you how to use the API. But, yes, this hosted models and local models are and they're a little distinct. Go ahead, Hugo.
+
+[10:16] **hugo bowne-anderson**: Absolutely. I really appreciate that clarification. So I just wanted to remind everyone who's just joining, please do join the Discord where we're having the chat and any questions you want to ask. We do it in order to, you know, be able to preserve the conversation, and we're gonna have lots of workshops in in our Discord as well. And the link is in the chat on on YouTube.
+
+[10:35] **hugo bowne-anderson**: I am wondering, Ravin, if you could just tell us a bit about you know, people who don't know what quantization or where training is and all all of these things, tell us about some of the key features of of Gemma.
+
+[10:48] **Ravin Kumar**: It's a little bit of a, like, CS one zero one, but, you know, when you have numbers in your computer, they take so much memory to to represent. And then you have these concepts like like float 16 and float 32, and float 32 means it takes 32 bits. I almost messed this up. Bits, I think, not bytes. But it takes more memory to get this longer representation.
+
+[11:10] **Ravin Kumar**: Now this is really great if you got a computer with, you know, massive amounts of RAM, But often, especially with LMs, we don't have a ton of space on our computer. So we need to make the numbers a little bit smaller. Rather than 1.2, point five, point 7.8, we might just want 1.2. A little bit of trade off here on performance accuracy, but through a lot of empirical testing, it's clear that, you know, you can quantize a model and which means cut it down.
+
+[11:35] **Ravin Kumar**: And with a quarter of the memory, you still get most of the performance. You know, not a 100%, but maybe ninety, ninety five percent of the performance even though it's a quarter of the size. Now one thing to know, though, is if you just cut it down without doing anything else, you lose a lot of performance. So there's this other strategy called quantized word training. That's the QAT that you see in those Gemma names, Gemma 27 b QAT.
+
+[11:59] **Ravin Kumar**: And that means a Gemma model has been cut down to half or a quarter of its memory from the full sized model, but we train it a little bit more to retain some of that performance. So when you're using Gemma, I would suggest either using the full size one if you can or using what we're gonna do here, the QAT model. Now one thing I want you to look out for real quick is I switch between between models.
+
+[12:25] **Ravin Kumar**: So we'll talk about model size in a little bit, but you're gonna see me flip between 27 b QAT, 12 b QAT, and just a four b without the QAT level. This is because on four b, it's small enough, 4,000,000,000 parameters, and it just fits in my my computer. No issues. It runs quickly at the four b size, but when you go to the bigger sizes, it's too much memory. So that's a quick explainer of the parameter size and QAT.
+
+[12:51] **hugo bowne-anderson**: Super cool. Thank you for that rich and and and clear description. What I'm going to do is I I've created the Gradio app, but do you have this notebook open? Are you able to show people this, Ravin?
+
+[13:05] **Ravin Kumar**: The notebook one?
+
+[13:07] **hugo bowne-anderson**: Yep. Notebook zero. It's notebook zero.
+
+[13:09] **Ravin Kumar**: No. Sorry. Notebook zero. Yeah. Let me pull it up. Hugo, are you gonna pull up the grad AI or do want me to pull up the notebook?
+
+[13:18] **hugo bowne-anderson**: It's a good question. So why why don't we save the image stuff till the next the the next notebook? So what I'm gonna do is I'll just pull up pull up pull up the app. And so just for for everyone for a bit of a bit of clarity, before diving into the code, Gradio is super fast for MVP development. I don't have much front end experience, so it allows me to spin up things quickly, Works really nicely with Hugging Face among other things. And it's just great for rapid rapid prototyping.
+
+[13:45] **hugo bowne-anderson**: And so actually, let me just go to the code, and I need to share my entire screen. Right. And, Ravin, if there are questions in Discord, feel free to answer them just by typing as well. And if if there are ones that'll that that would like to talk about as well, we can. Can you see cursor on my screen, Ravin?
+
+[14:12] **Ravin Kumar**: I cannot. I can only see a notebook.
+
+[14:15] **hugo bowne-anderson**: Okay. Let me try this again. How about now?
+
+[14:24] **Ravin Kumar**: Give me a sec.
+
+[14:25] **hugo bowne-anderson**: Yes. I can see it now. Okay. Great. So just showing you all, this is literally, you know, 48 lines of of code, and I set up a database in it for logging, which we'll get to. Then I have our chat with Gemma three model there, and then I set up this is all I need to do, like, six lines of code for my Gradeo in interface. Okay? So and just bear with me. You able to see my terminal, Ravin?
+
+[15:03] **Ravin Kumar**: I do see your terminal.
+
+[15:04] **hugo bowne-anderson**: Okay. Great. So, actually, what is the yeah. So let's that app I just showed you, I'm going to run now. And what this does, the Gradyo app gives me something local. And now I get to chat with Gemma three three b. So we're not doing anything multimodal yet, but hey, Gemma. What's up? I'm teaching a workshop with Ravin Kumar from from DeepMind and from being a legend, and we're teaching, you know, multimodal models and agentic stuff. Super fun. Okay. Hey. That transcript so that I was using something called Super Whisper.
+
+[15:45] **hugo bowne-anderson**: If anyone wants to check out Super Whisper, they don't pay me great great piece of software to plug my voice into anything. Okay. Look. So in Gemma, because it's a friendly friendly chap, that sounds absolutely incredible. A workshop with Ravin, seriously impressive. Hey. You've you've done some post training there, Ravin, to make sure it says you're seriously impressive. Multimotor models, agentic AI, all of that stuff. Super cool. So we were able to get that up and running super easily.
+
+[16:15] **hugo bowne-anderson**: Now what I want to do and once again, I don't wanna think about this too much, but it is important, and we can share previous workshops for those who wanna dive in more. Can you see the notebook again, Ravin?
+
+[16:29] **Ravin Kumar**: I see, yes, the notebook in that browser.
+
+[16:32] **hugo bowne-anderson**: Great. So there was you saw that I've logged some stuff to SQLite there. And I just wanna say this is incredibly important for observability. You wanna be able to track inputs, outputs, model decisions, all of that type of stuff. We use SQLite because it's really great for MVPs. You may wanna scale to use different types of databases. And then this is the code that I had in in the script, which is in the repository. And then we can explore it using dataset, which is a wonderful it's from Simon Wilson, who's a legend generally.
+
+[17:05] **hugo bowne-anderson**: Intro database UI, super fast, built in querying, easy exporting. So I just wanna give you a quick sense of how that works. So firstly, you'll see we've written this chat log database, and we can see it's just started up this server. Let's open this link. And what and can you see dataset?
+
+[17:28] **Ravin Kumar**: I can.
+
+[17:29] **hugo bowne-anderson**: Great. So you can see I've got chat log, chat history. I'm gonna go to the chat log, actually. Let me go to the chat history. You can see this is the one I just did that you saw me do, and it's logged. Fantastic. Plus the response, plus time stamp. And this is a test I did half an hour ago or whatever or an hour ago just to make sure this was working. And you can see, you can export CSV. So well, that didn't export it. Yep. Download file, export CSV.
+
+[17:56] **hugo bowne-anderson**: And if we had more time, I'd load it into a spreadsheet and and see what's up there because spreadsheets are your best friend when building this type of software. Now one final thing before going on, and this is putting the cart before the horse slightly. But let me just show you what happens. We don't haven't done anything multimodal yet. Right? So I just wanna show you what happens when you do. And let me let me just show you the code here so you can see cursor again, Ravin?
+
+[18:35] **Ravin Kumar**: I sure can.
+
+[18:36] **hugo bowne-anderson**: So you can see here and we're not using Lava now. We're actually using let me get this right. Wait a second. Where where is the model choice? Can you see where the model we specify the model here, Ravin?
+
+[19:03] **Ravin Kumar**: I cannot. Only look locally.
+
+[19:12] **hugo bowne-anderson**: Let me
+
+[19:17] **Ravin Kumar**: I think it's you run a local model, it seems, an alarm response.
+
+[19:27] **hugo bowne-anderson**: Yep. So that's right. So let's now have a look at this. And so it is it is a Gemma model. I'm it is the Gemma three one. So what I'm gonna do is put this image here and say, hey there. What's up in this image? This is just an image I got from the Internet. Okay. So it says in this image, we're seeing a dog has been creatively costume to look like a character from a horror movie. Okay? So this is this is great.
+
+[20:07] **hugo bowne-anderson**: We're able to put an image in and in, you know, however many lines of code we had. This is 42 lines of code, right, that we're able to to use to generate this basic interface, which allows us to have these multimodal experiences. So, also, the other thing, I wanna say how many dogs are there in this image. I'll misspell because LLMs are chill with that. There is one dog in this image, and this is once again a a bit of a teaser photo of dogs. Stop being so cute, Internet.
+
+[20:47] **hugo bowne-anderson**: I'm just gonna save this as dogs in downloads and then see well, that's okay. What do I wanna do there? To make sure it's actually ingestible, I'm just gonna take a screenshot. Sorry for this silly silly fool. And then, yep, let's take this screenshot. Well, big fail. Okay. I'm gonna say again, how many dogs are there in this image? And we'll see what's up. There are two puppies in this image. So that's cool. It's all there are two puppies. I don't like that it said there are two puppies and not two dogs.
+
+[21:32] **hugo bowne-anderson**: Just because when thinking about and we don't even want a sentence. Right? We want we want a number coming out. So we now need to convert this into some form of int or something like that, which we'll we'll get to in a bit. But the basic idea is that, locally, we've been able to spin up in just over 40 lines of code, a multimodal model, and start chatting with it by dropping images in in the GUI. And also able to log conversations and all of those things as well.
+
+[22:01] **hugo bowne-anderson**: So let's just go back to the repository. So what we've essentially done is, yeah, we've built a local chat app, being able to drag and drop images and and chat with them. We've got all our SQLite stuff set up so we can log every everything we need. We learned how to export chat logs to CSV, discuss how structured logs can help us track track responses.
+
+[22:28] **hugo bowne-anderson**: And next up, we're going to and and Ravin will take it take take more of this, but getting really back into all the all the image stuff and thinking about the image aspects of these multimodal systems. Is there anything else you'd add, Ravin, before switching up a bit?
+
+[22:45] **Ravin Kumar**: No. It's good.
+
+[22:46] **hugo bowne-anderson**: Awesome. And I hope you all can have a lot of fun, you know, with these with these basic scripts that that we've done as well in order to, you know, build a bunch of multimodal stuff.
+
+[23:01] **Ravin Kumar**: That's good. I sent you a share a screen share request.
+
+[23:06] **hugo bowne-anderson**: You should have. Yep. You should
+
+[23:07] **Ravin Kumar**: be good to go. Okay. Alright, folks. Thank you for that super wonderful introduction, Hugo. I'm gonna go ahead and pull up the second where we labeled notebook one. We were big on zero indexing. Hugo and I
+
+[23:20] **hugo bowne-anderson**: Of course. Let me go
+
+[23:21] **Ravin Kumar**: ahead and share my screen. Hugo, are you seeing this?
+
+[23:25] **hugo bowne-anderson**: Yes. So just if you could zoom in.
+
+[23:28] **Ravin Kumar**: Oh, of course. Okay. So, folks, I am in I am in basic image calls. I'm gonna walk you through the code that underlies the GradIO app and show you how you can both build an eval harness. And later on in the next notebook, I'll show you how you can do more than just a chat response. But let me go ahead and show you a little bit deeper behind the scenes. We won't dwell too much on this, but a little bit behind the scenes of how this all works on the research side.
+
+[23:56] **Ravin Kumar**: So I pull up two papers here, and I'll I'll drop them in the chat at some point. But actually, three papers. Let's start with PALIJEMMA. So this paper, PALIJEMMA, it's it shows you how this works under the hood. And you're not gonna have to do this yourself, but I just wanna give you a quick research side of how this is all put together. So, basically, with these these multimodal models, you have something that takes your text, like, where is this photographer resting? It tokenizes it using a text tokenizer, and this is the with the LMCs.
+
+[24:31] **Ravin Kumar**: And then you also have, in this case, a picture. It goes through a vision encoder, which similarly takes takes this this thing and turns it into a bunch of numbers under the hood. Again, it goes to a model. PaliGemma was the older model based on Gemma two, which is why you see Gemma two b, and then you get this text generation. It's a little sideways, but in a hammock, under a tree, on a tropical beach. So this version of PaliJama was able to identify this image.
+
+[25:02] **Ravin Kumar**: If you wanna dig in a little bit deeper, we show some really, really low level details like how image masking and and stuff works. But this is all the stuff that's going on under the hood to make these multimodal models work. Now if we step up a level, I'm jumping over to the Geometry paper up here at the at the top, the Geometry technical report. Geometry is trained to do a whole bunch of stuff.
+
+[25:27] **Ravin Kumar**: And if you're working with LMs or picking LMs, one thing that's done academically is there's a lot of these public evaluations, and these are all acronyms for different different emails. And those are text ones, but, similarly, you have vision ones here. So Gemma three, when we built it, we looked hard for, you know, captioning, make sure it could do visual question understanding, whether it could understand charts, whether it could tally things, and you have all these metrics on how all these things work.
+
+[25:59] **Ravin Kumar**: And these are really how we optimize these models or part of how we optimize these models to be useful for folks like you. What that all means, is once we get to to the public release with the help of Alama and others, I we just it's just a really simple interface. You don't have to worry about all these details and things like that. If you want, you can go and dig into them. And if folks want, I'll answer a couple of questions on that.
+
+[26:21] **Ravin Kumar**: But when you get to the when you get to the public release, just like Hugo showed, you have this very simple interface. I'm now using the Olama Python interface. And here, I'm grabbing a demo four b. I'm looking for a chat response in the model. I give it the the model that I'm using. In this case, it's Gemma four b. The model prompt would just say hello to this class, and then I'm gonna pull out the message and content. And if I just run it with a four b model, it's pretty quick on my laptop.
+
+[26:49] **Ravin Kumar**: How's everyone doing? You can see talk like a pirate, so, you know, it's not a it's not free can, and here we are. It's a little more pirate y. We got a lot more pirate sort of words in here like I and shiver me timbers, but that's it. That's Gemma four p package up for you. If you've taken our previous tutorials, you've seen this functionality many times, so I won't I won't dwell on it. What I wanna showcase today is how you can add an image to to the Gemma series of models.
+
+[27:19] **Ravin Kumar**: And so here, this time, as Hugo has shown, we've pulled a lot of different images for you, a lot of new ones. This one happens to be just a bunch of bunch of docs. And I go in here, and I just grab my image path. Locally, it's that image and docs dot jpeg. I'm gonna use the 27 b model this time, and I'm just gonna ask what is this? But let's just make it fun. I'll say talk like a pirate.
+
+[27:46] **hugo bowne-anderson**: And while you do that, can you just tell us a bit about what type of hardware people would need to be able to run a 27 b model quickly?
+
+[27:55] **Ravin Kumar**: So for large a 27 b model okay. So I actually, this is a good plug for me. Let me pull up a video, and I'll just show it to you real quick.
+
+[28:06] **hugo bowne-anderson**: Amazing.
+
+[28:07] **Ravin Kumar**: Yeah. Give me two seconds, folks. Share my model. I'll pull this I'll pull this down. See if I can do that. So I'm with Google. I recorded a video on which Gemma size is right for you. Let's see if I can do this live. I'll just skip to the punch line. So this is how we think about the Gemma sizes when we release them. We're gonna be using this range here, four b to twelve b. So twenty seven b is gonna have a great understanding and it's a top performance in the open weight series.
+
+[28:39] **Ravin Kumar**: Four b is gonna be a balance. We're gonna, again, play around with that a bit as you saw. One b is actually in the Gemma series as well. This is a text only model, but it runs on phone. So let me pull ahead and see if I can find you the next infographic. I wanna I won't be oh, here we go. Alright. So it's a little grayed out, not video form. But here's how we think about it.
+
+[29:05] **Ravin Kumar**: 27 b is good for workstations in cloud, but 27 b is actually running on my MacBook right now, although, admittedly, it's a bit of a higher end MacBook. 12 b should run on most laptops today even if it doesn't have a GPU. Four b is for a higher end smartphone or medium range smartphone, and then one b is for very, very quick analysis embeddings and things that need really quick quick responses. So that's how we think about the Gemma series of models.
+
+[29:33] **Ravin Kumar**: And all LLMs, if you haven't if you don't not aware, are have different numbers of parameters. And the bigger the parameters are, it's just, like, more horsepower in an engine. You know? A v eight engine is gonna get you a lot of torque and power and output, but it's a bigger engine. But, as you know, you need smaller engines, like, a moped or on a motorcycle to get you around quick when you don't quite you're not quite towing a trailer or doing anything like that.
+
+[29:59] **hugo bowne-anderson**: Useful, man. Awesome.
+
+[30:01] **Ravin Kumar**: Appreciate it. And let me double check if there's any questions real quick. What's the benefit of you using Olama Image? Oh, you guys have the answer, so we're good there. I'll let you go do that. Okay. So this is where we're gonna flip between different model sizes. Just so you know, I've I work with the general models as you imagine quite a bit. So I already have a good vibe check or vibe sense of which model capabilities are good where, but let's go through it in this tutorial together.
+
+[30:26] **Ravin Kumar**: We'll start with the $20.70, which is the best, and then we'll try out different ones as well. So, actually, we're gonna side by side this. Let's let me go back to the original pro. This is the 27 b again. We'll let it run. You're gonna notice it's gonna take a little bit longer on a MacBook, about eight to nine seconds. Oh, it still has the the pirate. Let's run it one more time. Oh, I know why. Give it one more go. Okay.
+
+[31:04] **Ravin Kumar**: Let me figure out why we keep getting the pirate response even though I have definitely switched this. What is this image of? One more go. So this, folks, is how you know we're doing it live.
+
+[31:25] **hugo bowne-anderson**: Without a doubt. This is the fun stuff.
+
+[31:27] **Ravin Kumar**: Mhmm.
+
+[31:28] **hugo bowne-anderson**: I can't see why it would be pirate again either, to to be honest.
+
+[31:32] **Ravin Kumar**: Yeah. I think I'm a little confused where it's grabbing the response from. We're gonna do one more thing, which is just copy this out to a new cell, and then I give it a shot.
+
+[31:43] **hugo bowne-anderson**: Fascinating.
+
+[31:45] **Ravin Kumar**: Yeah. This one's interesting because this one's a a Python Python It's a different
+
+[31:49] **hugo bowne-anderson**: model now, though, as well.
+
+[31:52] **Ravin Kumar**: That's true. Okay. We're gonna skip past the best one because I can't see quite on top of my head, but we're gonna go with the demo for for me model and just run it here. This one should be quicker. Okay. This is also gonna give me a pirate response, it feels like. So always fun with live tutorials because you always end up doing a okay. This one was actually normal. This is the general four u model, and, again, we get a nice nice representation here. It says nine trans rubber ducks on a transparent background.
+
+[32:28] **Ravin Kumar**: So this is a quick vibe check for you folks. I wanted to show you two different models and how to pass in an image. Both of these look pretty good, although I'm curious what's going on with the Python bug here. There's another hypothesis I have. I won't go into it right now. It has to do with KB caching and and how Olama works, but we'll just skip that for a moment. We have two models. They both seem to have really good really good performance.
+
+[32:53] **Ravin Kumar**: So something you and I talk a lot about in in his course, especially if you take his course, but something you'll hear me say as well, is these AI models are changing so fast. It's kinda hard to tell exactly how they respond. And you get things like parameter size and whatnot, but it it doesn't one to one translate with how good it is with your use case. Something we a challenge we have as model developers is, you know, we think of a lot of different use cases, but we can't think of every possible use case.
+
+[33:19] **Ravin Kumar**: You know, there we literally have millions, if not billions of LN users in the world at this point, and each one of you comes with your own your own needs, your own prompts, and it's not very straightforward to always know that our model is gonna work exactly in what you're doing. So something that you'll hear about a lot both from, you know, hugo and I, but also Hamal and other folks in the LM space is how you need to eval these models and you need to double check out what they do.
+
+[33:44] **Ravin Kumar**: Actually, our one of our favorite guys, as hugo mentioned, is Simon Wilson, and he's got a really funny eval where he asks LMs to create a picture of a a pelican riding a bicycle. Like, that's his favorite eval use case. As you start working with LMs, you'll notice this as well. So what we just did here is what you're gonna be doing when you use LMs is a quick vibe check, But let's move from the vibe check to specific use cases.
+
+[34:09] **hugo bowne-anderson**: And let me just add, I do think from a lot of stuff I say publicly and people I work with, I think there's a misperception with that that I'm not into vibe checks. And I I just wanna correct that. I think vibe checks can get you a huge a huge way.
+
+[34:25] **hugo bowne-anderson**: But in the end, when you wanna start building more reliable, consistent software, you do wanna have some sort of way to evaluate what happens when you switch out, you you know, your chunking strategy for something else, or you change your OCR, or you update to a new model and that type of stuff. So you do want more robust evaluations later on. But at the start, when when when prototyping and getting good demos out, vibe checks are definitely the way to go.
+
+[34:53] **Ravin Kumar**: Agree. I think he as as Higu says, vibe checks are good good way to go and good way to start. But we need to formalize them at some point, and that's the flow we're gonna take in this tutorial as well. We're gonna vibe check-in this notebook so I can just show you some different use cases, and you get a sense of the models. And then we'll move to a basic but programmatic eval harness in the in the next section.
+
+[35:16] **hugo bowne-anderson**: And mister me, who I is Pascal, who he's actually works in data science and generative AI for the US Air Force, and he was in the the first cohort of our course. Incredible build up and and and lovely dude. He's got a really good question in Discord, which is, so you could programmatically feed pictures to Gemma three and use the LLM to classify as family pictures versus non family pictures. And you're already preempting I know. What we're doing. So the short answer is yes.
+
+[35:43] **hugo bowne-anderson**: We won't be doing family versus no no family, but we'll be doing exactly that. Exactly that. And then taking actions based upon what what is seen there. So, yeah, you could imagine if you're trying to classify your photos on your iPhone, you could have something with a basic, like, Google Drive MCP or whatever, which does classification and routes it to a particular folder, maybe some edge cases that puts in a third folder for you to check out, and then you've got everything where you want it, essentially.
+
+[36:11] **Ravin Kumar**: That's a yeah. You you run our minds there on this one. So you'll see more about image classification, and and we're gonna talk about non chat workflows in a second. Let's go ahead and show a couple more use cases with folks, and then we'll jump over to the next one. As Hugo said, another thing he's doing a lot is grabbing receipts. To save Hugo's privacy and not not judge his dining options, I didn't ask him for a receipt, but I pulled this receipt from a stock image website just so it's we're free of PII.
+
+[36:37] **Ravin Kumar**: And so we grabbed this one from Freepik. It's a, you know, pretty standard template receipt. We can go in, and I'm gonna use 27B again, and we'll ask it what's in the image. Again, I'll run this live. I ran it before just to make sure it worked, but let's go ahead and keep going. I have a feeling you might respond like a pirate, which is gonna be real funny if it does, but let's see. Image path, and the prompt here is this one's a little more functionalized. I grab a prompt. I put it here.
+
+[37:08] **Ravin Kumar**: What is the text in this image? Now this is a bigger image, and there's more going on, so it's gonna take a little bit longer. One thing to know is that with LMs, the two there's two things that take that there's just three things off the top of my head that make the inference time longer. The first one and the obvious one is parameter size. It's just how long or how big is the sorry. How big is the model? Let me paste this again. I made the classic error of not pardon this out.
+
+[37:42] **Ravin Kumar**: One more moment, folks. Response. Alright. There we go. Okay. Let me finish that thread, and then we'll go with here. So one is the size of the model. It makes the input time longer or shorter. Some some applications are very real time intensive. So you maybe want a smaller model versus larger model. The other ones the other two, though, are the size of the input. So with text, it's the number of tokens that go in, and that one is easily measurable. So you can just kind of the rule of thumb just to see folks know.
+
+[38:15] **Ravin Kumar**: This doesn't work all the time, but, typically, if you take the length of the tax and you divide it by three or four, that's approximately the amount of tokens that go in with most most tokenizers. So it's just a quick rule of thumb that we use in our heads as we're thinking about token length. But images are a little bit trickier. So images, it really depends on the implementation of the of the LLM. There's a lot that happens in the background for image scaling or images.
+
+[38:41] **Ravin Kumar**: So even if you have a really big image, typically with LMs, you could scale down to a fixed size. This is so it just fits nicely into the LM. But sometimes in some LM, inference implementations, you have this thing called pan and scan, which actually doesn't shrink down the image. It takes a bunch of bytes of a particular size, so it sees all the image at at a full resolution.
+
+[39:02] **Ravin Kumar**: And so there's a bunch of different tricks you can do to make images prompt, image understanding better, and this is often what's happening under the hood with with different apps. It's hard I will say you don't actually know what's happening when you use the hosted applications, but with local applications, the quick tricks I'll I'll mention off the mention off the top of my head again are rescaling. Cropping is a good one. You can have an another LLM or not an LLM.
+
+[39:33] **Ravin Kumar**: Another, like, image detection algorithm crop down to what you care about or these, like, pan and scan implementations. Extra bonus for you guys showing up this tutorial to get some more knowledge out of my heads.
+
+[39:43] **Ravin Kumar**: But for
+
+[39:43] **hugo bowne-anderson**: now, Ravin So this is great. And so one quick question, Ravin, or a double question. Mike Powers is in the house. Yeah. And and Mike would love a few words, if possible, of how vision models differ from traditional, modern, dedicated OCR approaches to OCR. And I do wanna extend that. I mean, Pascal also asked about, you know, whether using CNNs for specific things could could work. So maybe just a few words about what else there is in the space.
+
+[40:14] **Ravin Kumar**: So this is a good a good segue into the history of LMs, and I won't wax on this too long. Let's take a few a minute here. So I think in a in a lot of technology, there's sort of been three phases. If I I'm gonna make this really, really care cartoonized, but there was a there was an era where you had very specialized models that do a very specialized thing.
+
+[40:35] **Ravin Kumar**: So Hugo and I are old enough to be from the original data science phase where you had a, like, a SVM classifier, and then you had a a random forest classifier. And, like and then if you wanted to do other things, like unsupervised learning, you had a different model. Like and so there are all these specialized models. And if you're doing a kind of competition, you would pick the specialized model for your for your task. This is the same for, like, OCR.
+
+[41:00] **Ravin Kumar**: You'd have to have an OCR model that would pull up the text features from an image, and then they put the text features into into an SK learn thing. And you had these big trees of OCR model first, then a a text regularizer, and then an SEM classifier, and then maybe another classifier on top of it. You know, all this model ensembling going on. One shift, like, was really, really 2013, 2014 is people started using neural nets to do a lot of these kind of competitions.
+
+[41:26] **Ravin Kumar**: And for a while, if you had image competitions, for instance, if it was guaranteed that people were using neural nets now rather than an older specialized algorithm like an OCR image algorithm. But, nonetheless, you still had a neural net that would take an image and say, this is a dog and this is a cat and whatnot. And but even within the neural net, you had specialized architectures. Like, you had a CNN or you had a protection LSTM. So you got RNNs or you had full dense networks.
+
+[41:53] **Ravin Kumar**: Like, there were different neural networks, and you would pick different ones depending on the specific task you were doing at that moment. But in the last since 2017 with Google and then, you know, a lot of research from other companies as well coming together, transformers have really just taken over everything. So even in the neural network space, just to show you here again the the the research paper, and now I'm glad I brought it up. I thought it was a little bit too level too low level.
+
+[42:20] **Ravin Kumar**: You don't even need CNNs or really much of that stuff anymore. Like, this is this is the PaliGEM architecture. You just have a tokenizer. You get some embeddings. You have a vision tokenizer. You get some embeddings, and you just give it to the decoder. Even down here, I think I gotta find it. They write in the paper, I can share this with you, that and I'll just read this real quick and explain what it says. A linear layer projecting Siglet outputs into the same dimension as Gemma two b's vocab token vocab tokens that they've concatenated.
+
+[42:52] **Ravin Kumar**: Early experiments, we found more complicated in alternatives such as multilayer perceptrons did not provide a clear advantage, hence, the the decision to use the simplest option. So the researchers here, they tried more complicated architectures, and they just decided the juice was not worth the the squeeze. And fascinating enough, that is what continues to be happening in a lot of cases. It's this mix of, like you try complicated things and you find the simple things works, and you can then add a little bit more complicated things to get some more performance.
+
+[43:27] **Ravin Kumar**: But, frankly, what's been happening is that once you get the next generation of models, turns out you don't need the complicated things anymore. There's this this thing called, like, the bitter lesson of computer, the bitter lesson of n and n and n's, but it's and it it's kind of this idea that with each progressive series of models, all the complicated things you had to do in the last version, once you get more compute, they just kinda go away, and you're good.
+
+[43:51] **Ravin Kumar**: And that's just the world we've been in right now, and it's really been a driver of the incredible progress that you've seen so far.
+
+[43:56] **Ravin Kumar**: So a little
+
+[43:57] **hugo bowne-anderson**: bit longer also Yeah. I I I sorry. You were about to to say something.
+
+[44:02] **Ravin Kumar**: Oh, just I was gonna close it. It was a little bit longer than a minute, but, hugo, yeah, what was your takeaway from that?
+
+[44:06] **hugo bowne-anderson**: Well, yeah, I'd I'd totally agree and appreciate all of that, well, rich history and and details about progressions of models. I'd I would say a lot of people building at the application layer do realize that although things get easier with more compute and and better models, cost and latency don't necessarily scale as well as you'd want depending on, you know, what you're serving into how many users and those types of things.
+
+[44:31] **hugo bowne-anderson**: So one example is when I work with people building LLMs as judges, and people I work with know this, people who've taken my course know this, people in the chat know this, building a basic judge at the start, sure, get an LLM to judge a bunch of things, but a lot of the time, you wanna do programmatic tests for structured output instead of l instead of LLMs as a judge. You wanna use regex, regular expressions or string and and fuzzy matching and those types of things.
+
+[44:57] **hugo bowne-anderson**: And similarly, perhaps when building a RAD system, you don't wanna use, you know, your infinite context, quote quote unquote, or your very, very large context. You wanna use smaller models to do something cheaper at different parts of the pipeline. And I'll try to find it. Matthew Honnable, who created spaCy, among other things, has a really interesting talk. Like, given certain domains, how many samples do you need to to include in prompts for in context learning with BERT to get it as performant as ChatGPT, right, and modern BERT as well?
+
+[45:34] **hugo bowne-anderson**: So my only point is that modern, you know, state of the art models are huge, hugely performant and widely general in in their use cases. But I do see a lot of people using smaller things at different points in in the pipeline. Like, if you don't need Gemma 27 for a certain part, maybe you use Gemma two or Gemma three b and and then hand off the the chunkier parts to to another model. But I am interested in your take on that, Ravin.
+
+[46:01] **Ravin Kumar**: I think so, Hugo again, going back to the screen, I think that's a good point, is maybe it was a little bit it sounded dismissive about older approaches or, like, our SVMs and whatnot. As Hugo mentioned, you know, if you can do your task with just using XGBoost or SVM, something that is now over a decade old, just do it. It's gonna run blazing fast. You don't need to use the latest models and and and things like that.
+
+[46:22] **Ravin Kumar**: So I would see this more instead of, like, a new generation and bigger models and you just forgot about the old stuff. The window of what you can do is expand it because you still have all the stuff from, you know, again, you've got a little old, but for, like, from the early twenty late two thousands, early twenty tens, you still have all the linear regression classifiers and everything like that if that's what you wanna use to classify your family photos.
+
+[46:43] **Ravin Kumar**: But you also have now LNs and things like that to help you out as well. And so while we're showing you the latest technology you have, the Gemma three series, if you need if you wanna go back, you should try the older series of models as well. And to that point, I will go we'll talk about that more concretely in the next notebook where where you have eval harness and whatnot. And I'll talk Hugo and I will talk more about how that eval harness is so important to help make this decision.
+
+[47:11] **hugo bowne-anderson**: Exactly. So just let me say a couple more things. I do think starting out when building a prototype, use something like this. Don't don't try to separate it into, you know, n different models in your in in in your data data workflow or or AI system. Right? Start with something like this. And if at points, you want, you know, more observability into how the OCR is working or you wanna try to lower costs or impact latency or those types of things, only then start start optimizing.
+
+[47:37] **hugo bowne-anderson**: And because we're on these things that we we actually cover a lot in the course, a word from our sponsor, which is is me, actually. I am I am the only besides Ravin, of course, quote, unquote, sponsor. But I'm gonna put a link to our our course in the chat, and our next cohort does start in a week. So if anyone's interested in joining or wants to chat about it, do do reach out and use the code l l m 10 for for 10% off for everyone as well.
+
+[48:07] **hugo bowne-anderson**: And the other thing I just wanted to say is Ravin and I, we've done three workshop. This is our third, and we'll link to the rest after the fact. But we've got another one coming up in August, which I've just linked to, called evaluating, and it's all about AI agent evals. So before going we're gonna be doing some of that today. But, Ravin, maybe you can tell us a bit give us a brief teaser of what's coming up in in August.
+
+[48:32] **Ravin Kumar**: Oh, so I think you and I we're finding we're building on these workshops just so easy easy to mention, and there continues to continues to be interesting in demand for them. So in in August, we're gonna be covering agents in particular. We covered a little bit in the last sessions, but all I can say is there's more to come. It's an exciting space where a lot is happening.
+
+[48:53] **Ravin Kumar**: So he actually, one thing I'll say here, it's hard you've gotta you've gotta plan these workshops a month in advance, but it's always hard to tell what's gonna be happening a month from now even for me. Yeah. So for instance, if I give you a plug, Google and some of my colleagues just released Gemma CLI last week and Gemma three n. And I I wanted to include those in here, but Hugh and I planned this workshop out a month in advance, and I couldn't I didn't know when those were gonna be released.
+
+[49:22] **Ravin Kumar**: And so now I'm like, oh, boy. I wish we had included them. But a month ago, I didn't even know they were gonna be released just before our tutorial. So next next session, we could cover a little bit of Gemini CLI, and we could cover a little bit of Gemini three n. Just timing wise, the space is moving so quick that even when you're on the inside, you're not quite sure what each month is gonna is gonna look like. So my teaser is in a month.
+
+[49:45] **Ravin Kumar**: There's gonna be even more cool stuff to show you, and we're gonna be back in a month to to give you more on the agent side.
+
+[49:50] **hugo bowne-anderson**: Fantastic. So okay. Let's let's get going.
+
+[49:53] **Ravin Kumar**: Alright. So I'm gonna show you the last quick use case here. So you saw we were we had some toy ducks. So let's actually let's actually go ahead. I'll do some live coding here again. A little dangerous. But let's go and say ducks. How many ducks are in this image? We're gonna give this to the image path image chat, which is using 27 b. It's gonna take a little bit. And let's wait another couple seconds here.
+
+[50:32] **Ravin Kumar**: And while it's going, actually, let me go switch this out to a four b so we can we can get this going a little quicker too. So let's go and turn this over to four b so we can move on. I'm gonna go ahead and just run that. I might have to restart my whole kernel. Let's give it a sec. Alright. I'm just gonna restart my kernel, folks. We'll get going. Just do this for me. Alright.
+
+[51:04] **Ravin Kumar**: So
+
+[51:04] **hugo bowne-anderson**: Oh, I I I think I know why it's pirate. Or why it would be for me is sometimes I've actually got you know, in OLAMA, you can have, you know, a a a JSON quick, like, defining a new model based on a model. There may be something like that where you have a system prompt.
+
+[51:23] **Ravin Kumar**: That is a good point. I think so. You and I run this a couple times, so I might have actually used them that's right. I might have used the model that I already put a system prompt in, but let's let's move on from there. So with Ollama, some quick features, you know, you can have multiple models as you're seeing here. You also can then put a system prompt in that gets injected behind the scenes. I think I actually did that for previous tutorial.
+
+[51:46] **Ravin Kumar**: So behind the scenes, Ollama is injecting in some stuff, but we'll go ahead and use the four b. So in the four b, we just got this image. I know it's a little big on my screen, but we have one, two one, two, three, and then we have +1, 23, so a grid of nine. And we get that from from Gemma Gemma four b. And then I have a picture of some real ducks here. And so we can quickly count as humans.
+
+[52:08] **Ravin Kumar**: We have four four ducks, but let's go ahead and run it through the four b model as well. So four ducks and and 4,000,000,000 parameters. And let's see if the four b model can nail this. I tried this with 27 b, but this is gonna be a good test of the of the smaller image capabilities here in a second. Alright. And four b gives us again there are four ducks in its image. That's that's fantastic.
+
+[52:32] **hugo bowne-anderson**: If you caught it Difficult.
+
+[52:34] **Ravin Kumar**: You saw a longer response from 27 b. I won't run it again, but you can definitely see it in the GitHub repo. That was a 27 b. You can see they have a slightly different different behaviors. So as here what I have been alluding to a lot in this course, the different models, even if they're Gemma models, don't all behave the same, and and you can see that in my video as well.
+
+[52:55] **Ravin Kumar**: The the bigger models tend to have, quote, unquote, the best performance, but at the bigger size, they like you said, they're they take a lot of compute and things like that, and so you might not always want that model all the time. This then begs the question is when do you know which models you use where?
+
+[53:12] **Ravin Kumar**: And so what we're gonna do is we're gonna go through the last notebook here pretty quickly where we're gonna be having a specific a specific thing, which is we're just gonna we're gonna wanna classify whether something is a hot dog or not a hot dog. So here is a picture of a hot dog, and here's arguably a picture of a hot dog as well. The notebook image viewer is not too good, but we'll but you can tell and you can pull up the image.
+
+[53:39] **Ravin Kumar**: This is a I guess, in one sense, a pretty hot dog, and he's wearing a costume. It might be a little warm outside. But we're gonna do a hot dog and not a hot dog classifier. For folks that have watched Silicon Valley, you know what we're all what we're talking about. And we're gonna put it all together into a classifier and then downstream action. So I think in the chat, it came up. Can I use this to classify family images or not? And the answer totally is yes.
+
+[54:03] **Ravin Kumar**: You don't have to use these models always as a chat interface. It doesn't always have to be although it's a beautiful GradIO app, and I don't wanna talk to you down on hugo, but you don't always have to have these interfaces that are, you know, put something in, get a prompt, get something out, you know, do the next turn, do the next turn, do the next turn. You can build these workflows that are really just in this case, a classifier one. We'll talk we talked about the agent one in the past.
+
+[54:27] **Ravin Kumar**: We'll talk about one in August again. But it's take an image, do something, but what it means do something more than just output text.
+
+[54:38] **Ravin Kumar**: So we're gonna go ahead and I'm gonna reimplement
+
+[54:40] **hugo bowne-anderson**: Maybe I'll just I'll I'll also just add yeah. I mean, I love chat into interfaces and shipping them to share things with friends, colleagues, whatever it may be, is is super useful. But to be very clear, this is one of the reasons agents are so so exciting or function calls, while loops with function calls, is chat interfaces aren't gonna deliver the main economic value of these these incredible generative technologies now. I mean, because chat interfaces, they scale linearly with with human time. Right?
+
+[55:12] **hugo bowne-anderson**: So for me to get anything out of a chat, it involves human hours spent. So that's why being able to automate things and incorporate these foundation models in workflows, I think, will be some of the most impactful things that we see, particularly when we're not only able them to get them to return text, but able to take action, such as we'll see here and more in the next workshop.
+
+[55:34] **Ravin Kumar**: So this is yeah. So you get a point. We're gonna show you that that's not just chat, and we're gonna build it up one step at a time. But we're gonna start with what I'm calling image chat just to get going, and then we'll move on to the to the non chat stuff. So I'm reimplementing the function from before. Again, this time, I take a prompt, an image path, and I specify the model as an argument.
+
+[55:55] **Ravin Kumar**: Same as before, we pass those in in the middle and using the OLAMA interface, the chat and chat response interfaces, we get a response. So while this is the chat, let's go through it. I'm gonna use the 27 b model again this time. Let's render it as markdown just to get a little bit more text niceties. So, again, we'll give this about a good, you know, eight or nine seconds to see whether it can recognize whether this is a what this image is.
+
+[56:27] **hugo bowne-anderson**: Also, I think we've normalized it too much to be clear. The fact that you're running a 27 b model on on your laptop is absolutely wild, dude. It is. We're able to do these these these days. Yeah.
+
+[56:36] **Ravin Kumar**: Yeah. I would I mean, this is a quick plug for for for Apple and whatnot, Hugo and I, part of the things we always always do is go get a go get a MacBook because they are actually quite flexible these days to do a lot of different tasks including Incredible. Give us a couple more seconds. This is taking a little bit longer than I would have expected, but here we go. Okay. So okay. This is an image of a wiener dog dashed on, uningested as a hot dog.
+
+[57:05] **Ravin Kumar**: So one thing we can tell just through Vibe Vals, even I'm recognizing this as well, the 12 the '20 seven b model is a little bit is a little chatty. It it says a lot of things, which is kinda cool if you're trying to have a conversation. But sometimes you just want the the response or the prompt. So this time, I'm gonna pass in the the not hot dog image, same one we had before here, and I'm gonna give it a little bit more of a of a prompt.
+
+[57:29] **Ravin Kumar**: I'm gonna say, is this an image of a hot dog of the food item of a hot dog? Say yes. Otherwise, say no and no other output. Because I've run this before, you can see the output, but we'll go ahead and I'll run it again while we're talking. And this actually runs a little bit faster. So there's one thing to know, and, again, this is a lower level detail why this is running more quickly and perhaps why the other one was having an issue.
+
+[57:51] **Ravin Kumar**: In LM inference, there's this concept called the KB cache, and there's this concept called first time to time to first token. So if you're a big LM serving nerd, these words will mean something to you, but I'll assume that you folks are not. So I'll give you the quick quick spiel here. There's a lot of stuff that happens when you train an LM in the architecture and what I showed you in the Polygemba papers.
+
+[58:12] **Ravin Kumar**: And so there's a whole body of research in just how do you make the LM train really well and how do you build a good architecture. But there's an equally big body of knowledge at this point on how do you make LM super super fast at what's called inference time. If you use Gemini or or even a ChatGPT o three or these thinking models, a lot happens in what at the runtime of the model, not just the train time of the model. This is the thinking tokens and stuff that you've seen.
+
+[58:37] **Ravin Kumar**: Now Gemma is not a thinking model, but it has, like, all modern LLMs has has a key value tokens under the hood, and there's a thing called k b cache. And when you run the when you run a model the first time, it can take a bit to get that response as you saw before. What happens is those tokens get cached. Olama implements a k b cache, and that means that subsequent calls can be quicker if the prompts are about the same.
+
+[59:02] **Ravin Kumar**: In this case, we use the same prompt, which was the same image, so we got the response much more quickly. We also immediately are not doing a long generation, so now we get this response much more fast. Again, another, like, lower level insight. When you work with LMs a lot, these are, like, little tidbits that you pick up. But it's just something to think about as you're building a classifier. You're saving time from token generation. And as you're using the same prompt over and over again, you get you get a KB cache.
+
+[59:28] **Ravin Kumar**: It's just a quick inference time speed up trick. But in this case, we got our answer much more quickly, and this time, again, we're getting in, like, a little bit less than a second, maybe a little bit over a second, but much more quick, and we see that this is not a food item. Now we did have a picture of a hotdog with a mustard, and so I'm gonna run this and we get yes. Now this is a new image, so this might take a bit longer.
+
+[59:50] **Ravin Kumar**: I don't think the KB cache is quite filled out. So we'll give it a minute or maybe a couple seconds or so. But this is the moment where Keith and I wanted to do this really live off the cuff. So I have my two images of hot dogs and and hot dogs of of a different sort. But if you have any, you should paste them in the chat. I'm gonna save them to my local computer, and I'm gonna run this totally live to see if if we get an answer that that works or not.
+
+[01:00:15] **Ravin Kumar**: So take a moment, grab your pictures of hot dogs and not hot dogs, and put it in the chat. And I'm gonna scroll down to the basic eval harness, which is where we're gonna we're gonna test this.
+
+[01:00:26] **hugo bowne-anderson**: And part of the the the wonderful thing here is that we just wanna get you involved in generating some of the data that we're gonna label so that we have some sort of ground truth to build our eval harness against. And the amount of people I work with and consult and teach you when I ask them to hand label a few images or 20 rows or something, half the people say, can we get an agent to do that instead? And that there are several issues with that.
+
+[01:00:52] **hugo bowne-anderson**: First, we all should know human learning before agent learning, even just a bit. The other thing I'm slightly concerned about is where where's your curiosity about the system you're building as well, which is one of the most important characteristics. That's one of the reasons I I went from well, I was working in scientific research, but into data science. So there's a bunch of people really curious about about data and how their systems work. So we really wanna have a look at some things in order to understand what what's up there.
+
+[01:01:19] **hugo bowne-anderson**: So we're asking people to share in Discord photos of hot dogs or not hot dogs. Is that correct?
+
+[01:01:26] **Ravin Kumar**: That is right. If you if you have one, throw it in. And let me talk to the eval harness then while if folks wanna put something in. But what Hugh and I have been doing so far is vibe eval ing. I think this is totally fine. Again, it's a good start. You get a sense of how things are working. Even through our basic vibe eval, we saw that Gemma four b and 27 b reacted differently.
+
+[01:01:45] **Ravin Kumar**: But once you start building, you know, bigger applications or, actually, once you start building an LLM over a couple of days even or a couple of weeks, you'll start forgetting what you've done. So this is a good time to start building an eval premise. You what this means is you're gonna wanna programmerize your emails. Now if you go and I have an entire session on emails in our in our first one, and you'll find also nice blog posts from our favorite folks like Simon, Hamel, and others. But this is what we're gonna be doing here.
+
+[01:02:16] **Ravin Kumar**: I'm not gonna run these examples one by one by hand anymore. I'm gonna start, putting them into a Python loop. And we have a ground truth label, which is yes and no, and we have the image. And I'm starting to get images from folks from you folks as well. So I'm gonna go ahead and add those into my my repo and make them available to the to the app. So let's say Brooklyn style pizza. I see one here. So we got a pizza. We have a hotdog. I see here in chat.
+
+[01:02:49] **Ravin Kumar**: Let's let's go ahead and grab that, and let's grab this image of a of a dog. Thank you. This is perfect. An an extraordinary dog as the as you're seeing pop up here.
+
+[01:02:59] **hugo bowne-anderson**: So And so just just quickly, we can only see your notebook, but you're pasting it in now, so we haven't seen Discord.
+
+[01:03:06] **Ravin Kumar**: Alright. Oh, okay. For folks looking go ahead and look at Discord. I'm gonna show you the images here in a second. So let's go ahead and oh, sometimes the the interface from it's not so great. So let me, let me pull them up, in my image viewer image role. So here we have a, Brooklyn style pizza. That's one of them. And let's go ahead, and I'll I'll copy that in. You guys, did send me ones with very long, file names, so I can't just type them in by hand. And then classic issue.
+
+[01:03:43] **Ravin Kumar**: So we're gonna say this is not, not a not a dog or hot a hotdog food. We have a picture of an extraordinary dog as you may see from the file file name. So let's go ahead.
+
+[01:03:56] **hugo bowne-anderson**: He looks so wise. I the dog does look pretty extraordinary,
+
+[01:04:00] **Ravin Kumar**: I have to say. Let's go ahead and throw that in. Image image slash. Also, the best part about live tutorials is everybody gets to watch you type. Alright. Extraordinary dog. This is also a no. And then we have a picture of a Sonora bacon wrapped hot dog, which also looks pretty good. So this actually is a food item hot dog. We'll go ahead and throw this one in as well. And so I haven't paid anyone to give me specific ones. This is all just from you folks off the cuff.
+
+[01:04:35] **Ravin Kumar**: Let's go ahead and fix this Python dictionary. So it's looking good like that. Okay. And so now we have our our base eval harness. We have our two images that we've checked before, and we have our new ones here. Let's go ahead and throw an image directory in front of it. Okay. Now I'm gonna run this, and we're gonna see what the responses are. Add some commas. Okay. Where am I missing?
+
+[01:05:05] **hugo bowne-anderson**: The second line after yes. The second line of the cell.
+
+[01:05:10] **Ravin Kumar**: Oh, okay. Perfect. Alright. So we're gonna head and we're gonna see whether our classifier gets it right or not. We're gonna run this. This might take a bit because now we're running five images. So we're probably gonna be here for a good I'm gonna guess thirty seconds to a minute. But this is
+
+[01:05:25] **hugo bowne-anderson**: While while we're waiting for that, I do wanna say this is such a lovely basic way to go from, like, vibe vibe checks to doing a basic eval harness. Very basic. Right? But and we're gonna move on from this after, but we'll link to our previous workshop where we build more robust eval harnesses.
+
+[01:05:44] **hugo bowne-anderson**: And we we'd really encourage you all to see if you can extend this into something more robust that when you switch out a model, you can actually get metrics on latency and cost if you're pinging APIs and whether it does give you the ground truth, how it performs on on the test set and so on. And for those from a machine machine learning background, just remember, eval harness is really just a test set plus plus in sometimes. Right? So that's all you're doing. Like, there isn't much different to classic ML products here.
+
+[01:06:14] **hugo bowne-anderson**: I just wanna make that very clear.
+
+[01:06:16] **Ravin Kumar**: Yeah. I think there's a lot of even though these are new models, a lot of the concepts come still come from the data science and previous model worlds. They really again, as Hugo and I were talking about earlier with you folks, there was a lot of development stuff that happened earlier. And then just because we're now in this new LLM era doesn't mean we need to forget all the lessons from the past. And just like you guys said, this test plus plus or test harness idea or train test set is a perfect example of that.
+
+[01:06:45] **Ravin Kumar**: Alright. So we're getting a couple of relabeled backs. I'm actually curious to see what the new ones. Alright. It looks like it got these correct. These are not the food item. This is a food item, but not a hot dog. So the LM or Gemma was smart enough to to make that distinction. He noticed that our extraordinary dog is also not a food item, which is great, and then it got the snoring hot dogs. So far, this is a pretty good hot dog not hot dog classifier.
+
+[01:07:11] **Ravin Kumar**: So this is we have our we have our thing. Got our eval harness. I'm actually pretty pleased with these results. Again, we didn't you guys gave us the images. We didn't plan this. So this was anyone's guess what would have happened, but it looks like we're we have pretty self performance. Now an important thing we you could talk about is we don't wanna just get text responses all the time. Sometimes we wanna actually go go do something.
+
+[01:07:34] **Ravin Kumar**: So the basics of this is you get your image prompt, you pass in a path, and then you ask it to to to do something. So here, I am let me grab the image path from before. Hot dog with mustard. This is just a a toy Python function, but if it's a if I only had a dog and a hot dog at the time, but if it's a if it's not a dog or if it is a dog, we can give it a treat. I think I mixed these up, actually.
+
+[01:08:03] **Ravin Kumar**: If it was a hotdog, we wanna add ketchup, but otherwise, we wanna give it a treat. All we're doing here is we're taking a response, and then once we parse it, if it's yes, do this. If it's something else, do that. In this case, it looks like it you know, it was a dog, so we wanna give it a treat. Although, I think I flipped the labels there a moment. But we wanna do more again than just output text. So something we can do is we can take an image.
+
+[01:08:26] **Ravin Kumar**: Let's take our let's actually take the Brooklyn pizza. You know, we have we have this. So let's go ahead and run it here. I'm gonna grab that. But we're gonna say if we have an image, we wanna write a new image, and we wanna pass in whether it's a hotdog or not a hotdog based on what the output what the output is. Now here's a bunch of code. I'm gonna be really frank with you, and and you're gonna probably notice. I didn't actually write this code by hand.
+
+[01:08:51] **Ravin Kumar**: I just prompted Gemini and told me to give me this thing, and I just said, hey. You know what? I have a thing that I need to have a function that takes an image, and if we get a text string that says it's not a hot dog, then then just add a big label in front of it that says it's not a hot dog. And it wrote all this code for me. I had to go back and forth a couple times, but this is this is the code.
+
+[01:09:10] **Ravin Kumar**: I won't go into it because, again, I didn't write a whole ton of it. But here, we we get our thing. If it's not a hot dog, let's say alright. Let's say image path image path equals image slash that. I'm gonna go ahead and run this, and it should run quick. It's not an LM call again. It is a it is a straight Python call. I should have a test tool call output. Oh, I haven't I messed up some import. Classic vibe coding. Import OS. Alright. Let's see if that one ran. Okay.
+
+[01:09:54] **Ravin Kumar**: So we should have a test tool call output. And, again, here we go. Okay. Perfect. Again, a little small in the the notebook viewer, but it's okay. You can see that this is our Brooklyn image our pizza image, which I didn't have ten minutes ago, and now it's labeled as not hot dog. Great. So now we have our classifier. We can go ahead and we can just use it on top of our LM. So this time, I'm gonna go ahead and run it through our LM.
+
+[01:10:25] **Ravin Kumar**: Let me use a different image so you know that that it's not just the same image from before. So let's go ahead and use our extraordinary dog image. It's also such a cute dog. I'm gonna say image path equals equals this. And let's say I'm gonna label this extraordinary extra dot labeled dot, let's say, p n let's say JPG just to make sure I don't mess up and make sure it runs. Something that was more confusing to me than LLMs, frankly, while writing this tutorial was was the image stuff and and TTS stuff.
+
+[01:11:10] **Ravin Kumar**: I actually spent a lot of time figuring out why I was running into issues with those two technologies. And those are older technologies. You would think that it would just work. But, nonetheless, here we go. We have our tool call. It's gonna call our LM here. If it's a if it's a hot dog I think I might have messed this up again, but let's we're gonna find out. It's gonna add one piece of text. Otherwise, it will add the other piece of text.
+
+[01:11:35] **Ravin Kumar**: You know, Higo, one thing I find funny is a few of the LMs, I I get all the stuff right, and then I make all my mistakes in the in the basic Python. So, actually, I think No. Don't. I think I if it is a hot dog, it's gonna flip the labels. This is a very classic mistake, folks, with with these binary levels.
+
+[01:11:50] **Ravin Kumar**: I'll say I make them all the time where I get all the the the LLM stuff right, but then I flip the label in in somewhere else in the code where I should just be able to to get it. Alright. It looks like it went through HotdogJPG, and so I might have messed this up. So this I I bet it I actually got it right. But you know what we can do? The smart thing to do here would be to log and print the response. So let's go ahead.
+
+[01:12:13] **Ravin Kumar**: Let me just do that real quick just to show you that maybe the LM is smarter than the human, and we have achieved AGI. Let's print the responses to see whether they get the response right, and then I will let you fix the Python bug in Python. So let's go ahead and say and let's make this easy. Print.
+
+[01:12:33] **hugo bowne-anderson**: I've got a wonderful demonstration of why observability and logging is is important. And we don't need, you know, fancy vendors at the moment to do this type of stuff when when building this, but this type of stuff happens all the time. So being able to introspect into your systems is incredibly important.
+
+[01:12:47] **Ravin Kumar**: So to Hugo's point, yes, being able to introspect your systems is key. You're actually live seeing another issue with LMs. I think what happens a lot with LMs, Hugo mentioned, is you spend a lot of time thinking about the LM, and then you make your mistake somewhere else in the program. And this is exactly what I did here. Again, live demo. So the LLM actually got it right. I have actually flipped the labels here, and this should have been a no. But there you go. This is why you wanna be logging stuff.
+
+[01:13:13] **Ravin Kumar**: This is why you wanna be having an eval harness is because it's all too easy to make these mistakes and then have them go to your production applications when you're mixing LLM and real time systems together.
+
+[01:13:23] **hugo bowne-anderson**: And just to be clear, like, is a a toy example of, you know, a tool call or an agentic approach where an image is classified, then you write on it and write that to to file, which is super cool. But you could imagine if if it's a hot dog, you get an email or a text message. You can hook it up to Twilio or something like that. Of course, maybe you don't, you know, wanna get a text message just because a hot dog photo comes in into your system.
+
+[01:13:45] **hugo bowne-anderson**: But the point is that it's it's arbitrary what tool you use. The fact that you can hook it up in this way is really the takeaway that we want you want you to have from here. And so Pascal's example before of classifying family photo or not family photo, you could imagine you'd hook it up to Google Drive, and you have a folder for family photos and one for other photos, and you, like, send them to each based on what it is in order to help you, you know, with your photo library.
+
+[01:14:12] **Ravin Kumar**: Yep. So this is a yeah. What you guys said is a perfect example of of an LM of an LM use case. And a pitch for local models in that one context is that with local models, all the stuff stays on your computer. So if you just wanna run this, like, overnight, I have a I have a Synology Network Cat Storage, which is constantly running.
+
+[01:14:34] **Ravin Kumar**: With a small model, like a four v model, I actually could put it onto my my NAS, and it could overnight just classify the photos that I have on on my file store. It's just sitting there. It's a it's a full Linux computer, and this is a really good application of sort of local file processing. Now to move on to to cloud file processing and what somebody had asked earlier was, can I do this with do this with Gemini? And so the answer is also yes.
+
+[01:15:02] **Ravin Kumar**: What we will do with Gemini is you're not calling your models local anymore. So we're not we're not able to use Olama because Olama is for local open weights models. But when you move to hosted models, you end up using that provider's SDK or software development kit. So for Google, ours is appropriately named from Google import Gen AI. And then from Gen AI, I can import types in a in a client and all this some are similar semantics that you've seen with with Allama.
+
+[01:15:31] **Ravin Kumar**: But now instead of calling running on my MacBook, what it's gonna do is it's gonna call out to to Google on Google servers. The good news here is that you get to a couple things potentially. One is you get for sure, you get frontier models. So you get models that are much more performant than the Gemma series of models. They're larger models for sure, but they've been trained on audio and text and images and all sorts of different things. Somebody also asked whether they can do image output. Yes.
+
+[01:16:02] **Ravin Kumar**: On the we have hosted models that can do image output. And, actually, as of Google IO a month ago, we have v o three, which can do full videos, realistic videos with audio. So you get a much larger set of of capabilities. Also, always do this in every tutorial, so, you know, I'll just show it here as well. You can use AI Studio. In AI Studio, you'll see all these different buttons for all the different things that, yeah, you can do. We won't go to the toggles.
+
+[01:16:28] **Ravin Kumar**: This will end up being a five hour tutorial if I talk about about everything that's possible, but there's a whole bunch of stuff. What I'm gonna do is I'm gonna grab an API key, and you're all gonna what's actually funny is that you're all gonna see it classic with actually, maybe I shoot another screen, but I'm gonna grab an API key. I'm gonna show you a Gemini call. So let me go ahead and just create an API key. I'll go ahead and just paste it in the tutorial so you see it there as well.
+
+[01:16:57] **Ravin Kumar**: I actually every time I do these tutorials, have to grab myself new API keys because I ended up committing my API key to the repo, and it got a notification from Google that I'd exposed my API key. Nonetheless, here is my API key that's gonna be live for maybe one minute. I go ahead and paste it here. You folks can go ahead and create your own API key in AI studio to do the same, and we can also then get an image classification. So you saw this one quite quickly. This one came back really fast.
+
+[01:17:24] **Ravin Kumar**: I will say one benefit of hosted models, even though they're much larger, because they're running on Google's TPUs or cloud provider, they are blazing fast. They're typically extremely quick, and you're seeing that here. We get a response nearly immediately, and we see a large response here, a close-up portrait of lavender retriever. The dog is looking at the viewer, like, very much describes what is going on with the scene. It gets a lot of details. Right?
+
+[01:17:50] **Ravin Kumar**: So it's much more of a let's call I'm gonna say, like, a more nuanced description than we would get from the smaller, like, a Gemma four b model. So even though the Gemma models got it right, they were kind of terse. This one gives you much more detail that you can you can play around with. So from here, you can go ahead and you can do the same flow that we did with the the Gemma series of models in OLAMA. You can do classification.
+
+[01:18:12] **Ravin Kumar**: You can do you can hook it up to a Python program that does other things like protects on talk. You can send out emails, whatever you wanna you wanna do. But with that, that's all of our pieces of ops. That's all of our pieces of the just I ran the I killed my API key. I'm running this again for some reasons, is why you're seeing the error. But nonetheless, we'll skip to the recap. What we've learned, not everything has to be chat. The models can be part of a bigger system.
+
+[01:18:40] **Ravin Kumar**: And from here, you can do really anything that you wanna do, whether it's hosted or local. Like you guys said, we don't need to just build the same application over and over again. It's, like, really cool that we have that chat application down, But you you folks are the ones that know what images you have, what you need, what you wanna do. And so this is where we hand these models off to you folks, and you folks can build whatever it is that you you need to or wanna build.
+
+[01:19:04] **Ravin Kumar**: And so that pretty much sums up our tutorial. And, Hugo, anything you wanna add at this point?
+
+[01:19:09] **hugo bowne-anderson**: Yeah. Firstly, thank you for sharing all of that and then moving into if people wanna use the the Gemini API as well. I may have missed it, but did you did you show AI Studio? Because it may be worth just
+
+[01:19:21] **Ravin Kumar**: I think I did. I flashed it on the screen, and we can we can bring it up again if people have a have a question.
+
+[01:19:26] **hugo bowne-anderson**: Yeah. I I mean, the one the one thing there is, like, showing people how they can rapidly prototype things and then click get code essentially.
+
+[01:19:34] **Ravin Kumar**: Yes. I will I'll send a link in Discord for the for the get code button. But, yeah, AI Studio has got so many features in it where you can just what you're doing is you can vibe Eval in AI Studio. And then when you're ready to move to a more a more concrete workflow where you need to code locally and you wanna hook it up to an eval hires and things like that, you just click get code.
+
+[01:19:54] **Ravin Kumar**: You'll get a bunch of code back, and then you're just in a Python notebook just like I was building your applications.
+
+[01:20:02] **hugo bowne-anderson**: Fantastic. So thank you so much, Ravin. We are gonna wrap up in five minutes or so. I've I've loved all the questions and all the engagement. It was so wonderful have so many interested people, both new people and and and faces and names that I recognize well from the community. I will just share my screen for one second. Let me can you see something that says stop building agents? I mean, that's ridiculous to show this right now. But can can you see that, Ravin?
+
+[01:20:33] **Ravin Kumar**: I don't see anything on your on your screen. Oh, let
+
+[01:20:37] **hugo bowne-anderson**: me try again.
+
+[01:20:38] **Ravin Kumar**: I don't see your screen.
+
+[01:20:39] **hugo bowne-anderson**: Right.
+
+[01:20:40] **Ravin Kumar**: There
+
+[01:20:41] **hugo bowne-anderson**: you Great. I've just included this, and I'll include it in the YouTube as as well. I just included it on Discord. This is the last edition of my newsletter where I've I've written something about stop building agents, but use them only really when necessary. Augmented LLMs and LM workflows should be your first approaches. That isn't really what I wanted to talk about here. What I wanted to say is that we've actually got a lot of online events this week.
+
+[01:21:08] **hugo bowne-anderson**: So you've just joined from images to agents with Ravin, but we've got a lightning lesson with John Berryman about GeniAir's four four pillars. And John actually worked on the precursor to Copilot at at at GitHub back in the day. Then we've got one on human seated evaluations with Samuel Colvin who built PyDantic. Then we have one on observability and debugging agents and with with Vincent from Comet who was at Microsoft and Qantas.
+
+[01:21:36] **hugo bowne-anderson**: And then this is gonna be one of my favorites on on on scaling AI from Colab to clusters with with Zach Muller from from Hugging Face. But this is intended for people kind of like myself a bit ago who, you know, don't know a huge amount about hardware, but wanna figure out how to really leverage hardware efficiently. So for all of you who are wonderful and love working in Colab notebooks and and and shipping, you know, basic production software, but rely on a lot of infrastructural people.
+
+[01:22:04] **hugo bowne-anderson**: This is an an opportunity to learn a lot more about all all the hardware and what you can do, you know, with distributed training and and and inference as practitioners as well. So I just wanted to share all of all of those things. But I would really love to thank you all for joining. And most of all, thank you once again, Ravin, for sharing your expertise and wisdom and good vibes as well. I always love running these workshops with you.
+
+[01:22:28] **Ravin Kumar**: Thank you, Hugo. I think we have a couple moments for questions. If folks wanna sneak them in, we'll we'll get any last ones.
+
+[01:22:38] **hugo bowne-anderson**: Absolutely. I can see I can see Priya is typing. Yeah. And I'll also remind you all that we are doing another livestream in in August about evaluating AI agents.
+
+[01:22:52] **Ravin Kumar**: Was there a separate session for Vertex AI or any name for it? So a quick one here. Google has a a number of AI offerings. I think we the company really is building AI on all fronts. And so to answer the question quite quite directly and succinctly for you folks, Google builds a series of models like Gemini and Gemma, and then we put them in a lot of different places. So one of those places for the the Gemini series is AI Studio. Actually, Gemma is an AI Studio as well.
+
+[01:23:22] **Ravin Kumar**: So you can use that for quick prototypes or things like that. And I'd say it's good for, like Hugo and I tend to be more from the the small vibe development community or at least a lot at least a lot of these sessions are. But there's also a lot of enterprise need for these these agents and or these models. And so these are from really big companies. You can think of, like, Fortune 500 companies and things like that. And so they they need the same LLMs, and they use the same LMs that you get.
+
+[01:23:48] **Ravin Kumar**: We don't we don't have specialized models for enterprises, but we do need to put it into Vertex AI because those enterprises use full cloud providers with all sorts of systems, and they're really in the the enterprise space. So everything you've learned here will work perfectly with Vertex AI. It's all the same models. It's all the same stuff. But Vertex AI is meant for enterprise with, like, full enterprise level controls and billing and costing and all the bells and whistles that come with a full enterprise enterprise solution.
+
+[01:24:20] **Ravin Kumar**: So the quick thing I could say is that if you're gonna be deploying these apps, let's take me because I'm good example. When I vibe code at home, I use AI Studio. I use Olama. Like, this is me as an individual developer and and having fun and playing around. But when I work in companies, then I use the same models but in, like, a Vertex AI solution because then I need to be using the same the integrated tooling and all that that comes with a larger enterprise.
+
+[01:24:46] **Ravin Kumar**: So, Priya, really, just I wouldn't worry too much about Vertex AI versus AI Studio for this particular tutorial, but just know that these will these ideas work with all those platforms.
+
+[01:24:57] **hugo bowne-anderson**: Yeah. I appreciate all of that context, and I'll give a slightly different answer. I've actually had several people in the community say, hey. We run workshops on Vertex or Azure or, like, SageMaker Studio in AWS and and that type of stuff. And I am very interested in what you all want to learn. I I feel like that's, you know, SageMaker's product marketing team's job, not my job, in all honesty, to to to educate how to use the their product.
+
+[01:25:24] **hugo bowne-anderson**: So you may notice that I don't I don't like and I'm very excited if the community wants to really learn a a lot of different things. But I don't really teach vendor vendor products or cloud infrastructure stuff. I'm far more interested in in teaching the foundation models and all the tools that allow you to really understand the space as opposed to the proprietary vendor stuff, if that if that makes sense.
+
+[01:25:50] **hugo bowne-anderson**: Of course, if there's enough demand to to learn these things, I'd probably reach out to Vertex about a partnership or something like that, to be honest. But please do keep the suggestions and and and and desires coming. It's just not particularly my type of thing, if that makes sense. Does that make sense to you, Ravin?
+
+[01:26:11] **Ravin Kumar**: Yeah. I think I would say the and this is historically my knowledge as well, is the the folks that are selling cloud solutions tend to do a really good job publishing videos and tutorials and stuff on how to use their their particular cloud solution. So go look for whichever vendor, whatever you're using, go look for docs. Typically, also, they have some good, like, representatives that are well versed in their technology. So I'll I'll even say myself, I'm not the expert at Google on Vertex AI.
+
+[01:26:37] **Ravin Kumar**: We have an entire team of people that they're just in Vertex AI day in and day out, and they know it so much better than me. And I know it's the same for all the other cloud providers as well. So they're actually a really good resource for you to learn how to use a particular cloud technology. Alright. I think Matt's just typing, so we may have one more last question coming in. What I'll say is I'll I'll say I'll get Hugh to this because I know he does this a bunch.
+
+[01:27:03] **Ravin Kumar**: But this Discord is gonna stay live. If you've got questions, you know, you just pop them in there. He goes in there answering stuff. So if you're watching this tutorial later and something comes up, just ping it in there. And then if if you need to get to me, hugo will tag me. But as he's mentioned, he's you know, these things keep coming up over and over again. So don't feel like you have to answer if you don't feel like you missed the boat right now. If you got a question, he's Hugo's gonna be around.
+
+[01:27:29] **Ravin Kumar**: I'm sure of that. And I'll be around as well. I that's my stalling for you. So if got a question, you got a couple more moments to to pop it in, and then and then we'll we'll give it a close.
+
+[01:27:44] **hugo bowne-anderson**: Alright. I suggest we wrap up because there's a delay on on on the livestream as as well. So it'll yep. But thank you everyone. And Matt also said thank you both for this genuinely an amazing session. If there was a tool you currently enjoy using for work or fun, what would it be? I think the answer is clearly the family of of Gemma models combined with AI Studio from from my perspective. With respect to this session, there are lot of others I'm excited about, but that that's my answer there. Thank you all for for joining.
+
+[01:28:16] **hugo bowne-anderson**: And once again, thank you so much, Ravin, for sharing your wisdom and expertise.
+
+[01:28:21] **Ravin Kumar**: Of course. Thank you all for showing up as well. I will see you in the next one.
+
+[01:28:30] **hugo bowne-anderson**: And scene. Dude, that was awesome. Good.
+
+[01:28:35] **Ravin Kumar**: I'm glad you enjoyed it.
+
+[01:28:37] **hugo bowne-anderson**: I'm I'm glad I did too. And I I I get the distinct impression you did also.
+
+[01:28:41] **Ravin Kumar**: Yeah. Thanks so much yesterday. I know you were you were running errands and running around the Apple Store and stuff like that, but, you know, all the voice messages and stuff got this thing worked together. Well
+
+[01:28:49] **hugo bowne-anderson**: We nailed it, man. Yeah. I did this I was doing this hustling. The Australian the financial year in Australia ends on the June 30. Like, it goes July to June. Yeah. And my because I went freelance last year, for various reason, my account was like, you need to spend more money, man. So I was I was hustling to to spend tax tax deductions. Let me just show you can you see
+
+[01:29:20] **Ravin Kumar**: Yeah. Looks pretty good. Chrome? Yes.
+
+[01:29:23] **hugo bowne-anderson**: Yeah. Yeah. So we had I
+
+[01:29:25] **Ravin Kumar**: have to jump immediately, but this has been great.
+
+[01:29:27] **hugo bowne-anderson**: Great. Well, yeah, all I wanna say is we had over a 100 people, great engagement, and excited for the next one. And we can just let's correspond on Discord or or email. I'd love your help, and I can give you a discount code to share with your community. But if you could help in promoting the course this week as well, because it starts next week, that would be amazing.
+
+[01:29:45] **Ravin Kumar**: Sounds good. Alright. I'll see you soon.
+
+[01:29:47] **hugo bowne-anderson**: Thanks so much, man. See you. Ciao.
